@@ -1,0 +1,21 @@
+{
+  "name": "ams_projet_cerisonet",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@angular/cli": "^21.2.0",
+    "connect-mongodb-session": "^5.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.1.1",
+    "pg": "^8.18.0",
+    "socket.io": "^4.8.3"
+  }
+}
