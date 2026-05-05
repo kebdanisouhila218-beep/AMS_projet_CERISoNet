@@ -1,0 +1,146 @@
+<div class="wall-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <img src="logo.png" alt="Avignon Université">
+      <div>
+        <h1>CERISoNet</h1>
+        <p>Réseau social du CERI</p>
+      </div>
+    </div>
+    <button (click)="onLogout()">Se déconnecter</button>
+  </div>
+
+  <!-- NOTIFICATION -->
+  <app-notification></app-notification>
+
+  <!-- UTILISATEURS CONNECTÉS -->
+<div class="online-users-bar">
+<span class="online-title">🟢 En ligne ({{ onlineUsers.length - 1 }})</span>
+  <div class="online-list">
+    <ng-container *ngFor="let user of onlineUsers">
+  <span class="online-user" *ngIf="user.userId !== debugInfo.userId">
+    {{ user.pseudo }}
+  </span>
+</ng-container>
+    <span *ngIf="onlineUsers.length === 0" class="no-users">Personne d'autre en ligne</span>
+  </div>
+</div>
+  <!-- BOUTON NOUVEAU POST -->
+  <div class="mur-header">
+    <button class="btn-nouveau" (click)="showForm = !showForm">
+      {{ showForm ? 'Annuler' : 'Nouveau post' }}
+    </button>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <div class="form-card" *ngIf="showForm">
+    <h3>Nouveau post</h3>
+    <div class="accent-line"></div>
+    <div class="form-group">
+      <label>Message *</label>
+      <textarea [(ngModel)]="newBody" placeholder="Quoi de neuf ?" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Image</label>
+      <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+    </div>
+    <div class="form-group" *ngIf="selectedFile">
+      <label>Titre de l'image</label>
+      <input type="text" [(ngModel)]="newImageTitle" placeholder="Titre" />
+    </div>
+    <div class="form-group">
+      <label>Hashtags</label>
+      <input type="text" [(ngModel)]="newHashtags" placeholder="#CERI #IA" />
+    </div>
+    <button class="btn-publier" (click)="publierPost()">Publier</button>
+  </div>
+<!-- BARRE DE TRIS ET FILTRES -->
+<div class="filter-bar">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>Trier par</label>
+      <select [(ngModel)]="sortOption" (change)="onSortChange()">
+        <option value="recent">Plus récent</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="likes">Plus aimé</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Hashtag</label>
+      <select [(ngModel)]="filterHashtag" (change)="onFilterChange()">
+        <option value="">Tous</option>
+        <option *ngFor="let tag of availableHashtags" [value]="tag">{{ tag }}</option>
+      </select>
+    </div>
+
+    <button class="btn-reset" (click)="resetFilters()"
+            *ngIf="filterHashtag || filterAuthor || sortOption !== 'recent'">
+      Réinitialiser
+    </button>
+
+    <span class="total-posts" *ngIf="totalPosts > 0">
+      {{ totalPosts }} post{{ totalPosts > 1 ? 's' : '' }}
+    </span>
+  </div>
+</div>
+  <!-- POSTS -->
+ <div class="post-card" *ngFor="let post of posts">
+  <div class="post-header">
+    <span class="post-owner">{{ post.createdByName || 'Anonyme' }}</span>
+    <span class="post-date">{{ post.dateISO | date:'dd/MM/yyyy HH:mm' }}</span>
+  </div>
+
+  <!-- body peut s'appeler "body", "message", "content", "text" selon les étudiants -->
+  <p class="post-body" *ngIf="post.body || post.message || post.content || post.text">
+    {{ post.body || post.message || post.content || post.text }}
+  </p>
+
+  <div class="post-image" *ngIf="post.image?.url || post.images?.url">
+    <img [src]="post.image?.url || post.images?.url" 
+         [alt]="post.image?.title || post.images?.title || ''" />
+  </div>
+
+  <div class="post-hashtags" *ngIf="post.hashtags && post.hashtags.length > 0">
+    <span class="hashtag" *ngFor="let tag of post.hashtags">{{ tag }}</span>
+  </div>
+
+<div class="post-footer">
+  <button class="like-btn" (click)="toggleLike(post)" [ngClass]="{'liked': post.userHasLiked}">
+    ❤️ {{ post.totalLikes || post.likes?.length || 0 }}
+  </button>
+  
+  <button class="toggle-comments-btn" (click)="post.showComments = !post.showComments">
+     {{ post.comments?.length || 0 }} commentaire{{ (post.comments?.length || 0) > 1 ? 's' : '' }}
+    <span class="arrow" [ngClass]="{'arrow-up': post.showComments}">▼</span>
+  </button>
+</div>
+
+<!-- Commentaires cachés par défaut -->
+<div class="comments-section" *ngIf="post.showComments">
+  <div class="post-comments" *ngIf="post.comments && post.comments.length > 0">
+    <div class="comment" *ngFor="let comment of post.comments">
+      <span class="comment-owner">{{ getUserPseudo(comment.commentedBy) || comment.pseudo || comment.author || 'Anonyme' }}</span>
+      <span class="comment-text">{{ comment.text || comment.body || comment.message || '' }}</span>
+      <span class="comment-date">{{ comment.date || '' }} {{ comment.hour || '' }}</span>
+    </div>
+  </div>
+
+  <div class="comment-form">
+    <input type="text" [(ngModel)]="post.commentText" placeholder="Ajouter un commentaire..." 
+           (keyup.enter)="addComment(post)" />
+    <button (click)="addComment(post)">Envoyer</button>
+  </div>
+</div>
+</div>
+
+  <!-- PAGINATION -->
+ <div class="pagination">
+    <button (click)="precedent()" [disabled]="page === 1">Précédent</button>
+    <span>Page {{ page }} / {{ totalPages || '?' }}</span>
+    <button (click)="suivant()" [disabled]="totalPages > 0 && page >= totalPages">Suivant</button>
+</div>
+
+</div>

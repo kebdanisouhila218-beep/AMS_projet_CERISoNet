@@ -1,0 +1,124 @@
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f8f8 0%, #fff5f3 100%);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.container {
+    background: white;
+    border-radius: 16px;
+    border-top: 4px solid #E63312;
+    box-shadow: 0 8px 32px rgba(230, 51, 18, 0.1);
+    padding: 48px 60px;
+    width: 100%;
+    max-width: 420px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.logo h1 {
+    color: #E63312;
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.logo p {
+    color: #6c757d;
+    font-size: 14px;
+    text-align: center;
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto 16px auto;
+    width: 80px;
+}
+
+.accent-line {
+    height: 3px;
+    background: linear-gradient(90deg, #E63312 0%, #F5A623 100%);
+    border-radius: 3px;
+    margin: 12px auto 32px auto;
+    width: 60px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+    background: #fafafa;
+    color: #2d3748;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #E63312;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(230, 51, 18, 0.08);
+}
+
+input::placeholder {
+    color: #b0bec5;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(90deg, #E63312 0%, #F5A623 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(230, 51, 18, 0.3);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(230, 51, 18, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.footer {
+    text-align: center;
+    margin-top: 32px;
+    color: #a0aec0;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    .container { padding: 36px 28px; }
+    .logo h1 { font-size: 24px; }
+}
