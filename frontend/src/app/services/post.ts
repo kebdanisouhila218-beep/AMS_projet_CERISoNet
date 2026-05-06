@@ -39,4 +39,25 @@ export class PostService {
   toggleLike(postId: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/posts/${postId}/like`, {}, this.httpOptions);
   }
+
+  getUserPseudo(userId: number): string {
+  if (!userId) return 'Anonyme';
+  const userMap: { [key: number]: string } = {
+    1: 'Fourmi', 2: 'Chien gris', 3: 'Chat noir', 4: 'Dauphin blanc',
+    5: 'Requin noir', 6: 'Écureuil blanc', 7: 'Sardine grise',
+    8: 'Poisson chat blanc', 9: 'Écureuil blanc', 10: 'Lapin rose',
+    11: 'Panda géant', 12: 'Tigre blanc', 13: 'Lion doré',
+    14: 'Aigle royal', 15: 'Singe bleu', 16: 'Zèbre rayé',
+    17: 'Girafe jaune', 18: 'Hippopotame rose', 19: 'Crocodile vert',
+    20: 'Flamant rose'
+  };
+  if (userMap[userId]) return userMap[userId];
+  const animalTypes = ['Fourmi', 'Chien', 'Chat', 'Dauphin', 'Requin',
+    'Écureuil', 'Sardine', 'Poisson', 'Lapin', 'Panda', 'Tigre',
+    'Lion', 'Aigle', 'Singe', 'Zèbre', 'Girafe', 'Hippopotame',
+    'Crocodile', 'Flamant'];
+  const animalIndex = (userId - 1) % animalTypes.length;
+  return animalTypes[animalIndex] || `Utilisateur ${userId}`;
 }
+}
+

@@ -1,0 +1,29 @@
+<div class="filter-bar">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>Trier par</label>
+      <select [(ngModel)]="sortOption" (change)="sortChange.emit(sortOption)">
+        <option value="recent">Plus récent</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="likes">Plus aimé</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Hashtag</label>
+      <select [(ngModel)]="filterHashtag" (change)="hashtagChange.emit(filterHashtag)">
+        <option value="">Tous</option>
+        <option *ngFor="let tag of availableHashtags" [value]="tag">{{ tag }}</option>
+      </select>
+    </div>
+
+    <button class="btn-reset" (click)="resetFilters.emit()"
+            *ngIf="filterHashtag || filterAuthor || sortOption !== 'recent'">
+      Réinitialiser
+    </button>
+
+    <span class="total-posts" *ngIf="totalPosts > 0">
+      {{ totalPosts }} post{{ totalPosts > 1 ? 's' : '' }}
+    </span>
+  </div>
+</div>

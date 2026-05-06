@@ -1,0 +1,71 @@
+.filter-bar {
+  background: white;
+  border-radius: 16px;
+  border-left: 4px solid #E63312;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #E63312;
+  white-space: nowrap;
+}
+
+.filter-group select {
+  padding: 7px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fafafa;
+  color: #2d3748;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  outline: none;
+  max-width: 200px;
+}
+
+.filter-group select:focus {
+  border-color: #E63312;
+  box-shadow: 0 0 0 3px rgba(230, 51, 18, 0.08);
+}
+
+.btn-reset {
+  padding: 7px 16px;
+  background: transparent;
+  border: 1.5px solid #E63312;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #E63312;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+  background: #E63312;
+  color: white;
+}
+
+.total-posts {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b0bec5;
+}

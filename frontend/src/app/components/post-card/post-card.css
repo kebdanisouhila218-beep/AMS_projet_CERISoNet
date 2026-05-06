@@ -1,0 +1,236 @@
+.post-card {
+  background: white;
+  border-radius: 16px;
+  border-left: 4px solid #E63312;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+  animation: fadeIn 0.4s ease-out;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.post-card:hover {
+  box-shadow: 0 8px 28px rgba(230, 51, 18, 0.12);
+  transform: translateY(-2px);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.post-owner {
+  font-weight: 700;
+  color: #1c1e21;
+  font-size: 14px;
+}
+
+.post-date {
+  color: #b0bec5;
+  font-size: 12px;
+}
+
+.post-body {
+  color: #2d3748;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 0 14px 0;
+}
+
+.post-image {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.post-image img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.post-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.hashtag {
+  background: linear-gradient(90deg, rgba(230,51,18,0.08) 0%, rgba(245,166,35,0.08) 100%);
+  color: #E63312;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(230, 51, 18, 0.15);
+}
+
+.post-footer {
+  display: flex;
+  gap: 16px;
+  color: #90a4ae;
+  font-size: 13px;
+  border-top: 1px solid #f5f5f5;
+  padding-top: 12px;
+}
+
+.like-btn {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6c757d;
+}
+
+.like-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.like-btn.liked {
+  background: linear-gradient(90deg, #E63312 0%, #F5A623 100%);
+  color: white;
+  border-color: #E63312;
+}
+
+.like-btn.liked:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(230, 51, 18, 0.3);
+}
+
+.toggle-comments-btn {
+  background: none;
+  border: none;
+  color: #90a4ae;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.toggle-comments-btn:hover {
+  color: #E63312;
+}
+
+.arrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.arrow-up {
+  transform: rotate(180deg);
+}
+
+.comments-section {
+  animation: fadeIn 0.3s ease-out;
+  margin-top: 8px;
+}
+
+.post-comments {
+  margin-top: 12px;
+  border-top: 1px solid #f5f5f5;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment {
+  background: #fafafa;
+  border-radius: 10px;
+  border-left: 3px solid #F5A623;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.comment-owner {
+  color: #E63312;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.comment-text {
+  color: #2d3748;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.comment-date {
+  color: #b0bec5;
+  font-size: 11px;
+}
+
+.comment-form {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f5f5f5;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 13px;
+  background: #fafafa;
+  color: #2d3748;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.comment-form input:focus {
+  border-color: #E63312;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(230, 51, 18, 0.08);
+}
+
+.comment-form input::placeholder {
+  color: #b0bec5;
+  font-size: 13px;
+}
+
+.comment-form button {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #E63312 0%, #F5A623 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(230, 51, 18, 0.2);
+  white-space: nowrap;
+}
+
+.comment-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(230, 51, 18, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

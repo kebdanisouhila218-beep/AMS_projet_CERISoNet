@@ -1,0 +1,58 @@
+<div class="post-card">
+
+  <!-- HEADER DU POST : nom du créateur et date -->
+  <div class="post-header">
+    <span class="post-owner">{{ post.createdByName || 'Anonyme' }}</span>
+    <span class="post-date">{{ post.dateISO | date:'dd/MM/yyyy HH:mm' }}</span>
+  </div>
+
+  <!-- CORPS DU POST : texte principal -->
+  <p class="post-body" *ngIf="post.body || post.message || post.content || post.text">
+    {{ post.body || post.message || post.content || post.text }}
+  </p>
+
+  <!-- IMAGE : affichée si elle existe -->
+  <div class="post-image" *ngIf="post.image?.url || post.images?.url">
+    <img [src]="post.image?.url || post.images?.url"
+         [alt]="post.image?.title || post.images?.title || ''" />
+  </div>
+
+  <!-- HASHTAGS : liste des tags du post -->
+  <div class="post-hashtags" *ngIf="post.hashtags && post.hashtags.length > 0">
+    <span class="hashtag" *ngFor="let tag of post.hashtags">{{ tag }}</span>
+  </div>
+
+  <!-- FOOTER : bouton like et bouton toggle commentaires -->
+  <div class="post-footer">
+    <button class="like-btn" (click)="onLike()" [ngClass]="{'liked': post.userHasLiked}">
+❤️ {{ post.totalLikes !== undefined ? post.totalLikes : (post.likes?.length || 0) }}    </button>
+    <button class="toggle-comments-btn" (click)="post.showComments = !post.showComments">
+      {{ post.comments?.length || 0 }} commentaire{{ (post.comments?.length || 0) > 1 ? 's' : '' }}
+      <span class="arrow" [ngClass]="{'arrow-up': post.showComments}">▼</span>
+    </button>
+  </div>
+
+  <!-- SECTION COMMENTAIRES : visible si showComments = true -->
+  <div class="comments-section" *ngIf="post.showComments">
+
+    <!-- LISTE DES COMMENTAIRES existants -->
+    <div class="post-comments" *ngIf="post.comments && post.comments.length > 0">
+      <div class="comment" *ngFor="let comment of post.comments">
+        <!-- getUserPseudo est dans PostService pour éviter la duplication de code -->
+        <span class="comment-owner">{{ postService.getUserPseudo(comment.commentedBy) || comment.pseudo || 'Anonyme' }}</span>
+        <span class="comment-text">{{ comment.text || comment.body || comment.message || '' }}</span>
+        <span class="comment-date">{{ comment.date || '' }} {{ comment.hour || '' }}</span>
+      </div>
+    </div>
+
+    <!-- FORMULAIRE D'AJOUT DE COMMENTAIRE -->
+    <div class="comment-form">
+      <input type="text" [(ngModel)]="post.commentText"
+             placeholder="Ajouter un commentaire..."
+             (keyup.enter)="onComment()" />
+      <button (click)="onComment()">Envoyer</button>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,11 @@
+<div class="online-users-bar">
+  <span class="online-title">🟢 En ligne ({{ onlineUsers.length - 1 }})</span>
+  <div class="online-list">
+    <ng-container *ngFor="let user of onlineUsers">
+      <span class="online-user" *ngIf="user.userId !== currentUserId">
+        {{ user.pseudo }}
+      </span>
+    </ng-container>
+    <span *ngIf="onlineUsers.length === 0" class="no-users">Personne d'autre en ligne</span>
+  </div>
+</div>
