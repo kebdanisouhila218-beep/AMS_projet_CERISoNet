@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PostService } from '../../services/post';
@@ -13,23 +13,26 @@ import { WebsocketService } from '../../services/websocket.service';
   styleUrl: './post-card.css'
 })
 export class PostCardComponent {
-  // Le post reçu depuis Wall
   @Input() post: any;
-  // L'ID de l'utilisateur connecté
   @Input() currentUserId: any;
 
   constructor(
     public postService: PostService,
     private authService: Auth,
-    private websocketService: WebsocketService
+    private websocketService: WebsocketService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  // Gère le like directement sans passer par Wall
   onLike(): void {
     this.postService.toggleLike(this.post._id).subscribe((data: any) => {
       if (data.success) {
-        this.post.userHasLiked = data.liked;
-        this.post.totalLikes = data.totalLikes;
+        // Réassignation complète pour forcer la détection Angular
+        this.post = {
+          ...this.post,
+          userHasLiked: data.liked,
+          totalLikes: data.totalLikes
+        };
+        this.cdr.detectChanges();
         const action = data.liked ? 'liké' : 'n\'a plus liké';
         this.authService.showNotification(`Tu as ${action} ce post`, 'success');
         this.websocketService.notifyPostLiked({
@@ -44,16 +47,33 @@ export class PostCardComponent {
       }
     });
   }
+@Output() postShared = new EventEmitter<void>();
 
-  // Gère le commentaire directement sans passer par Wall
+onShare(): void {
+  const body = this.post.shareText?.trim() || 'Je partage ce post.';
+  this.postService.sharePost(this.post._id, body).subscribe((data: any) => {
+    if (data.success) {
+      this.post = { ...this.post, showShareForm: false, shareText: '' };
+      this.cdr.detectChanges();
+      this.postShared.emit(); // 👈 signal au parent de recharger
+      this.authService.showNotification('Post partagé avec succès', 'success');
+    } else {
+      this.authService.showNotification('Erreur : ' + data.message, 'error');
+    }
+  });
+}
   onComment(): void {
     if (!this.post.commentText?.trim()) return;
     this.postService.addComment(this.post._id, this.post.commentText.trim())
       .subscribe({
         next: (data: any) => {
           if (data.success) {
-            this.post.commentText = '';
-            this.post.comments = [...(this.post.comments || []), data.comment];
+            this.post = {
+              ...this.post,
+              commentText: '',
+              comments: [...(this.post.comments || []), data.comment]
+            };
+            this.cdr.detectChanges();
             this.authService.showNotification('Commentaire ajouté', 'success');
             this.websocketService.notifyNewComment({
               postId: this.post._id,

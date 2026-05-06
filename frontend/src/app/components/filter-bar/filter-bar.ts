@@ -31,6 +31,9 @@ export class FilterBarComponent {
   onHashtagChange(): void {
     this.emitFilters();
   }
+  onAuthorChange(): void {
+  this.emitFilters();
+}
 
   // Remet tous les filtres à zéro
   resetFilters(): void {

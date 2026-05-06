@@ -12,11 +12,19 @@
 
     <div class="filter-group">
       <label>Hashtag</label>
-      <select [(ngModel)]="filterHashtag" (change)="onHashtagChange()">
-        <option value="">Tous</option>
+<select [(ngModel)]="filterHashtag" (change)="onHashtagChange()" class="select-hashtag">
+          <option value="">Tous</option>
         <option *ngFor="let tag of availableHashtags" [value]="tag">{{ tag }}</option>
       </select>
     </div>
+    <div class="filter-group">
+  <label>Propriétaire</label>
+  <select [(ngModel)]="filterAuthor" (change)="onAuthorChange()">
+    <option value="">Tous les posts</option>
+    <option value="me">Mes posts</option>
+    <option value="others">Les autres</option>
+  </select>
+</div>
 
     <button class="btn-reset" (click)="resetFilters()"
             *ngIf="filterHashtag || filterAuthor || sortOption !== 'recent'">

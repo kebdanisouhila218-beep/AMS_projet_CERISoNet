@@ -1,5 +1,4 @@
 <div class="post-card">
-
   <!-- HEADER DU POST : nom du créateur et date -->
   <div class="post-header">
     <span class="post-owner">{{ post.createdByName || 'Anonyme' }}</span>
@@ -10,6 +9,18 @@
   <p class="post-body" *ngIf="post.body || post.message || post.content || post.text">
     {{ post.body || post.message || post.content || post.text }}
   </p>
+
+  <!-- POST ORIGINAL PARTAGÉ -->
+  <div class="shared-post" *ngIf="post.sharedPost">
+    <div class="shared-post-header">
+      <span class="post-owner">{{ post.sharedPost.createdByName || 'Anonyme' }}</span>
+      <span class="post-date">{{ post.sharedPost.dateISO | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <p class="post-body">{{ post.sharedPost.body || post.sharedPost.message || '' }}</p>
+    <div class="post-image" *ngIf="post.sharedPost.image?.url">
+      <img [src]="post.sharedPost.image.url" [alt]="post.sharedPost.image.title || ''" />
+    </div>
+  </div>
 
   <!-- IMAGE : affichée si elle existe -->
   <div class="post-image" *ngIf="post.image?.url || post.images?.url">
@@ -25,26 +36,35 @@
   <!-- FOOTER : bouton like et bouton toggle commentaires -->
   <div class="post-footer">
     <button class="like-btn" (click)="onLike()" [ngClass]="{'liked': post.userHasLiked}">
-❤️ {{ post.totalLikes !== undefined ? post.totalLikes : (post.likes?.length || 0) }}    </button>
+      ❤️ {{ post.totalLikes !== undefined ? post.totalLikes : (post.likes?.length || 0) }}
+    </button>
     <button class="toggle-comments-btn" (click)="post.showComments = !post.showComments">
       {{ post.comments?.length || 0 }} commentaire{{ (post.comments?.length || 0) > 1 ? 's' : '' }}
       <span class="arrow" [ngClass]="{'arrow-up': post.showComments}">▼</span>
     </button>
+    <!-- BOUTON PARTAGE -->
+    <button class="share-btn" (click)="post.showShareForm = !post.showShareForm">
+      🔁 Partager
+    </button>
+  </div>
+
+  <!-- FORMULAIRE DE PARTAGE -->
+  <div class="share-form" *ngIf="post.showShareForm">
+    <input type="text" [(ngModel)]="post.shareText"
+           placeholder="Ajouter un message..." />
+    <button (click)="onShare()">Partager</button>
   </div>
 
   <!-- SECTION COMMENTAIRES : visible si showComments = true -->
   <div class="comments-section" *ngIf="post.showComments">
-
     <!-- LISTE DES COMMENTAIRES existants -->
     <div class="post-comments" *ngIf="post.comments && post.comments.length > 0">
       <div class="comment" *ngFor="let comment of post.comments">
-        <!-- getUserPseudo est dans PostService pour éviter la duplication de code -->
         <span class="comment-owner">{{ postService.getUserPseudo(comment.commentedBy) || comment.pseudo || 'Anonyme' }}</span>
         <span class="comment-text">{{ comment.text || comment.body || comment.message || '' }}</span>
         <span class="comment-date">{{ comment.date || '' }} {{ comment.hour || '' }}</span>
       </div>
     </div>
-
     <!-- FORMULAIRE D'AJOUT DE COMMENTAIRE -->
     <div class="comment-form">
       <input type="text" [(ngModel)]="post.commentText"
@@ -52,7 +72,5 @@
              (keyup.enter)="onComment()" />
       <button (click)="onComment()">Envoyer</button>
     </div>
-
   </div>
-
 </div>

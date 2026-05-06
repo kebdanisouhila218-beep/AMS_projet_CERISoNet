@@ -40,6 +40,14 @@ export class PostService {
     return this.http.post<any>(`${this.baseUrl}/posts/${postId}/like`, {}, this.httpOptions);
   }
 
+  sharePost(postId: string, body: string): Observable<any> {
+  return this.http.post<any>(
+    `${this.baseUrl}/posts/share`,
+    { sharedPostId: postId, body },
+    this.httpOptions
+  );
+}
+
   getUserPseudo(userId: number): string {
   if (!userId) return 'Anonyme';
   const userMap: { [key: number]: string } = {

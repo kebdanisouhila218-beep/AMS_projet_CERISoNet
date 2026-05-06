@@ -52,10 +52,11 @@
   </app-filter-bar>
 
   <app-post-card
-    *ngFor="let post of posts"
-    [post]="post"
-    [currentUserId]="currentUserId">
-  </app-post-card>
+  *ngFor="let post of posts"
+  [post]="post"
+  [currentUserId]="currentUserId"
+  (postShared)="loadPosts()">
+</app-post-card>
 
   <div class="pagination">
     <button (click)="precedent()" [disabled]="page === 1">Précédent</button>

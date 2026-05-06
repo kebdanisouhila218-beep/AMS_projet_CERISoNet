@@ -3,9 +3,6 @@ const router = express.Router();
 const crypto = require('crypto');
 const { pgClient } = require('../config/db');
 
-// ============================================================
-// ROUTE LOGIN : vérifie les credentials dans PostgreSQL
-// ============================================================
 router.get('/login', (req, res) => {
     const email = req.query.email;
     const password = req.query.password;
@@ -16,7 +13,7 @@ router.get('/login', (req, res) => {
         return res.json({ success: false, message: 'Email et mot de passe requis' });
     }
 
-    // Recherche de l'utilisateur dans PostgreSQL
+    // 1. D'abord le SELECT pour vérifier l'utilisateur
     pgClient.query('SELECT * FROM fredouil.compte WHERE mail = $1', [email])
         .then(result => {
             const user = result.rows[0];
@@ -25,30 +22,31 @@ router.get('/login', (req, res) => {
                 return res.json({ success: false, message: 'Email ou mot de passe incorrect' });
             }
 
-            // Vérification du mot de passe hashé en SHA1
             const hash = crypto.createHash('sha1').update(password).digest('hex');
-
             if (hash !== user.motpasse) {
                 return res.json({ success: false, message: 'Email ou mot de passe incorrect' });
             }
 
-            // Stockage des informations dans la session serveur
-            req.session.isConnected = true;
-            req.session.userId = user.id;
-            req.session.userPseudo = user.pseudo;
-            req.session.userEmail = user.mail;
+            // 2. Ensuite l'UPDATE seulement si le mot de passe est bon
+            return pgClient.query('UPDATE fredouil.compte SET statut_connexion = 1 WHERE mail = $1', [email])
+                .then(() => {
+                    req.session.isConnected = true;
+                    req.session.userId = user.id;
+                    req.session.userPseudo = user.pseudo;
+                    req.session.userEmail = user.mail;
 
-            console.log('Connexion réussie pour:', user.pseudo);
+                    console.log('Connexion réussie pour:', user.pseudo);
 
-            res.json({
-                success: true,
-                pseudo: user.pseudo,
-                user: {
-                    id: user.id,
-                    pseudo: user.pseudo,
-                    email: user.mail
-                }
-            });
+                    res.json({
+                        success: true,
+                        pseudo: user.pseudo,
+                        user: {
+                            id: user.id,
+                            pseudo: user.pseudo,
+                            email: user.mail
+                        }
+                    });
+                });
         })
         .catch(err => {
             console.log('Erreur base de données:', err);
@@ -56,16 +54,23 @@ router.get('/login', (req, res) => {
         });
 });
 
-// ============================================================
-// ROUTE LOGOUT : détruit la session
-// ============================================================
 router.get('/logout', (req, res) => {
-    req.session.destroy(() => res.json({ success: true }));
+    const userId = req.session.userId;
+
+    if (userId) {
+        pgClient.query('UPDATE fredouil.compte SET statut_connexion = 0 WHERE id = $1', [userId])
+            .then(() => {
+                req.session.destroy(() => res.json({ success: true }));
+            })
+            .catch(err => {
+                console.log('Erreur lors de la mise à jour du statut:', err);
+                req.session.destroy(() => res.json({ success: true }));
+            });
+    } else {
+        req.session.destroy(() => res.json({ success: true }));
+    }
 });
 
-// ============================================================
-// ROUTE TEST-SESSION : vérifie si l'utilisateur est connecté
-// ============================================================
 router.get('/test-session', (req, res) => {
     res.json({
         success: true,
