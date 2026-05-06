@@ -11,14 +11,41 @@ import { FormsModule } from '@angular/forms';
 })
 export class FilterBarComponent {
   // Données reçues depuis Wall
-  @Input() sortOption: string = 'recent';
-  @Input() filterHashtag: string = '';
-  @Input() filterAuthor: string = '';
   @Input() availableHashtags: string[] = [];
   @Input() totalPosts: number = 0;
 
-  // Événements envoyés vers Wall
-  @Output() sortChange = new EventEmitter<string>();
-  @Output() hashtagChange = new EventEmitter<string>();
-  @Output() resetFilters = new EventEmitter<void>();
+  // Événement unique envoyé vers Wall avec les filtres actifs
+  @Output() filtersChanged = new EventEmitter<{ sort: string; hashtag: string; author: string }>();
+
+  // État local des filtres (plus de @Input pour sortOption/filterHashtag/filterAuthor)
+  sortOption: string = 'recent';
+  filterHashtag: string = '';
+  filterAuthor: string = '';
+
+  // Appelé quand le tri change
+  onSortChange(): void {
+    this.emitFilters();
+  }
+
+  // Appelé quand le hashtag change
+  onHashtagChange(): void {
+    this.emitFilters();
+  }
+
+  // Remet tous les filtres à zéro
+  resetFilters(): void {
+    this.sortOption = 'recent';
+    this.filterHashtag = '';
+    this.filterAuthor = '';
+    this.emitFilters();
+  }
+
+  // Émet les filtres courants vers Wall
+  private emitFilters(): void {
+    this.filtersChanged.emit({
+      sort: this.sortOption,
+      hashtag: this.filterHashtag,
+      author: this.filterAuthor
+    });
+  }
 }

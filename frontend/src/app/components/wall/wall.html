@@ -1,6 +1,4 @@
 <div class="wall-container">
-
-  <!-- HEADER : logo, titre et bouton déconnexion -->
   <div class="header">
     <div class="header-left">
       <img src="logo.png" alt="Avignon Université">
@@ -12,23 +10,19 @@
     <button (click)="onLogout()">Se déconnecter</button>
   </div>
 
-  <!-- NOTIFICATION : bandeau de messages pour l'utilisateur -->
   <app-notification></app-notification>
 
-  <!-- UTILISATEURS CONNECTÉS : composant dédié, reçoit la liste via @Input -->
   <app-online-users
     [onlineUsers]="onlineUsers"
-    [currentUserId]="debugInfo.userId">
+    [currentUserId]="currentUserId">
   </app-online-users>
 
-  <!-- BOUTON NOUVEAU POST : affiche/cache le formulaire -->
   <div class="mur-header">
     <button class="btn-nouveau" (click)="showForm = !showForm">
       {{ showForm ? 'Annuler' : 'Nouveau post' }}
     </button>
   </div>
 
-  <!-- FORMULAIRE NOUVEAU POST : visible uniquement si showForm = true -->
   <div class="form-card" *ngIf="showForm">
     <h3>Nouveau post</h3>
     <div class="accent-line"></div>
@@ -51,32 +45,21 @@
     <button class="btn-publier" (click)="publierPost()">Publier</button>
   </div>
 
-  <!-- FILTRES ET TRIS : composant dédié, communique via @Input/@Output -->
   <app-filter-bar
-    [sortOption]="sortOption"
-    [filterHashtag]="filterHashtag"
-    [filterAuthor]="filterAuthor"
     [availableHashtags]="availableHashtags"
     [totalPosts]="totalPosts"
-    (sortChange)="onSortOptionChange($event)"
-    (hashtagChange)="onHashtagChange($event)"
-    (resetFilters)="resetFilters()">
+    (filtersChanged)="onFiltersChanged($event)">
   </app-filter-bar>
 
-  <!-- LISTE DES POSTS : chaque post est un composant post-card indépendant -->
   <app-post-card
     *ngFor="let post of posts"
     [post]="post"
-    [currentUserId]="debugInfo.userId"
-    (likeToggled)="toggleLike($event)"
-    (commentAdded)="addComment($event)">
+    [currentUserId]="currentUserId">
   </app-post-card>
 
-  <!-- PAGINATION : navigation entre les pages de posts -->
   <div class="pagination">
     <button (click)="precedent()" [disabled]="page === 1">Précédent</button>
     <span>Page {{ page }} / {{ totalPages || '?' }}</span>
     <button (click)="suivant()" [disabled]="totalPages > 0 && page >= totalPages">Suivant</button>
   </div>
-
 </div>
