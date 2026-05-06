@@ -19,6 +19,9 @@ const setupWebSocket = (server) => {
     io.on('connection', (socket) => {
         console.log('Utilisateur connecté via WebSocket');
 
+        // Envoie immédiatement la liste des connectés au nouveau socket
+        socket.emit('onlineUsersList', Array.from(connectedUsers.values()));
+
         // Un utilisateur s'identifie après connexion
         socket.on('userConnected', (userData) => {
             connectedUsers.set(socket.id, userData);

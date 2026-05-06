@@ -20,6 +20,18 @@ export class WebsocketService {
     this.connect();
   }
 
+  private identifyUser(): void {
+    this.http.get('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
+      .subscribe((data: any) => {
+        if (data.isConnected && data.userId) {
+          this.emit('userConnected', {
+            userId: data.userId,
+            pseudo: data.userPseudo || 'Utilisateur'
+          });
+        }
+      });
+  }
+
   connect(): void {
     this.socket = io(this.socketUrl, {
       reconnection: true,
@@ -31,16 +43,16 @@ export class WebsocketService {
       transports: ['websocket', 'polling']
     });
 
+    // Connexion initiale
     this.socket.on('connect', () => {
-      this.http.get('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
-        .subscribe((data: any) => {
-          if (data.isConnected && data.userId) {
-            this.emit('userConnected', {
-              userId: data.userId,
-              pseudo: data.userPseudo || 'Utilisateur'
-            });
-          }
-        });
+      console.log('WebSocket connecté');
+      this.identifyUser();
+    });
+
+    // Reconnexion après coupure
+    this.socket.on('reconnect', () => {
+      console.log('WebSocket reconnecté');
+      this.identifyUser();
     });
 
     this.socket.on('onlineUsersList', (users: any[]) => {

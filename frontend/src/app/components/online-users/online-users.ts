@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,11 +8,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './online-users.html',
   styleUrl: './online-users.css'
 })
-export class OnlineUsersComponent {
+export class OnlineUsersComponent implements OnChanges {
   @Input() onlineUsers: any[] = [];
   @Input() currentUserId: any;
 
-  get othersOnline(): any[] {
-    return this.onlineUsers.filter(u => String(u.userId) !== String(this.currentUserId));
+  othersOnline: any[] = [];  // ← plus un getter, une vraie propriété
+
+  ngOnChanges(): void {
+    // Recalculé à chaque changement d'input (liste OU currentUserId)
+    this.othersOnline = this.onlineUsers.filter(
+      u => String(u.userId) !== String(this.currentUserId)
+    );
   }
 }
