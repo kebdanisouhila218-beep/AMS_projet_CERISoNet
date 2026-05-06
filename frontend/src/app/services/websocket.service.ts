@@ -10,7 +10,6 @@ export class WebsocketService {
   private socket: Socket | null = null;
   private socketUrl = 'https://pedago.univ-avignon.fr:3170';
 
-  // BehaviorSubject garde la dernière valeur même si Wall s'abonne après
   onlineUsers$ = new BehaviorSubject<any[]>([]);
   newComment$ = new Subject<any>();
   likeUpdate$ = new Subject<any>();
@@ -20,16 +19,29 @@ export class WebsocketService {
     this.connect();
   }
 
-  private identifyUser(): void {
-    this.http.get('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
-      .subscribe((data: any) => {
-        if (data.isConnected && data.userId) {
-          this.emit('userConnected', {
-            userId: data.userId,
-            pseudo: data.userPseudo || 'Utilisateur'
-          });
-        }
-      });
+  /**
+   * Appelé depuis auth.ts après confirmation de session.
+   * Coupe l'éventuel ancien socket et en crée un nouveau propre,
+   * puis émet userConnected avec les bonnes infos.
+   */
+  identify(userId: any, pseudo: string): void {
+    console.log('identify() appelé pour:', pseudo);
+
+    // On déconnecte proprement l'ancien socket s'il existe
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
+    }
+
+    // On crée un nouveau socket propre pour cet utilisateur
+    this.connect();
+
+    // On attend la connexion puis on s'identifie
+    this.socket!.once('connect', () => {
+      console.log('Socket connecté, identification:', pseudo);
+      this.socket!.emit('userConnected', { userId, pseudo });
+    });
   }
 
   connect(): void {
@@ -43,16 +55,8 @@ export class WebsocketService {
       transports: ['websocket', 'polling']
     });
 
-    // Connexion initiale
     this.socket.on('connect', () => {
-      console.log('WebSocket connecté');
-      this.identifyUser();
-    });
-
-    // Reconnexion après coupure
-    this.socket.on('reconnect', () => {
-      console.log('WebSocket reconnecté');
-      this.identifyUser();
+      console.log('WebSocket connecté:', this.socket?.id);
     });
 
     this.socket.on('onlineUsersList', (users: any[]) => {
@@ -74,7 +78,9 @@ export class WebsocketService {
 
   disconnect(): void {
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
+      this.socket = null;
     }
   }
 

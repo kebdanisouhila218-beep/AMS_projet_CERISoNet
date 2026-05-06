@@ -47,8 +47,10 @@ export class Wall implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.authService.loadSession(this.websocketService);
+    // EN PREMIER : abonnements WebSocket avant tout appel réseau
+    this.initWebSocketSubscriptions();
 
+    // ENSUITE : abonnement userId$ avant loadSession
     this.subs.push(
       this.authService.userId$.subscribe(id => {
         this.currentUserId = id;
@@ -56,10 +58,11 @@ export class Wall implements OnInit, OnDestroy {
       })
     );
 
+    // ENSUITE : appels réseau
+    this.authService.loadSession(this.websocketService);
     this.loadHashtags();
     this.loadAuthors();
     this.loadPosts();
-    this.initWebSocketSubscriptions();
 
     this.checkSessionInterval = setInterval(
       () => this.authService.checkSession(), 30000
@@ -67,15 +70,21 @@ export class Wall implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // On désinscrit les subscriptions Angular
     this.subs.forEach(s => s.unsubscribe());
-    this.websocketService.disconnect();
+
+    // ← ON NE DÉCONNECTE PAS le WebSocket ici !
+    // Le WebsocketService est providedIn: 'root' (singleton global).
+    // Appeler disconnect() ici couperait le socket pour toute l'app
+    // et provoquerait la boucle connect/disconnect visible dans les logs.
+
     if (this.checkSessionInterval) clearInterval(this.checkSessionInterval);
   }
 
   initWebSocketSubscriptions(): void {
     this.subs.push(
       this.websocketService.onlineUsers$.subscribe(users => {
-        this.onlineUsers = users;
+        this.onlineUsers = [...users]; // spread pour forcer une nouvelle référence
         this.cdr.detectChanges();
       })
     );
@@ -106,7 +115,11 @@ export class Wall implements OnInit, OnDestroy {
     );
   }
 
-  onLogout(): void { this.authService.logout(); }
+  onLogout(): void {
+    // On déconnecte le socket UNIQUEMENT lors du logout explicite
+    this.websocketService.disconnect();
+    this.authService.logout();
+  }
 
   loadHashtags(): void {
     this.postService.getHashtags().subscribe((data: any) => {

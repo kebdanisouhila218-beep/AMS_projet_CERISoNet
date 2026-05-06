@@ -4,9 +4,6 @@ const { Server } = require("socket.io");
 const connectedUsers = new Map(); // socketId → userData
 const userSockets = new Map();    // userId → socketId
 
-// ============================================================
-// SETUP WEBSOCKET : initialise Socket.IO sur le serveur HTTPS
-// ============================================================
 const setupWebSocket = (server) => {
     const io = new Server(server, {
         cors: {
@@ -17,55 +14,61 @@ const setupWebSocket = (server) => {
     });
 
     io.on('connection', (socket) => {
-        console.log('Utilisateur connecté via WebSocket');
+        console.log('Utilisateur connecté via WebSocket:', socket.id);
 
-        // Envoie immédiatement la liste des connectés au nouveau socket
+        // Envoie immédiatement la liste courante au nouveau connecté
         socket.emit('onlineUsersList', Array.from(connectedUsers.values()));
 
-        // Un utilisateur s'identifie après connexion
         socket.on('userConnected', (userData) => {
-            connectedUsers.set(socket.id, userData);
-            userSockets.set(userData.userId, socket.id);
-            console.log('Utilisateur en ligne:', userData.pseudo);
+            const { userId, pseudo } = userData;
 
-            // Notifie les autres de la connexion
+            // ── Nettoyage : si ce userId avait déjà un socket, on le retire ──
+            const oldSocketId = userSockets.get(userId);
+            if (oldSocketId && oldSocketId !== socket.id) {
+                console.log(`Nettoyage ancien socket pour ${pseudo} (${oldSocketId})`);
+                connectedUsers.delete(oldSocketId);
+            }
+
+            // Enregistre le nouveau socket
+            connectedUsers.set(socket.id, { userId, pseudo });
+            userSockets.set(userId, socket.id);
+            console.log('Utilisateur en ligne:', pseudo);
+
+            // Notifie les autres
             socket.broadcast.emit('userStatusUpdate', {
-                userId: userData.userId,
-                pseudo: userData.pseudo,
-                status: 'online'
+                userId, pseudo, status: 'online'
             });
 
-            // Envoie la liste complète des connectés à tout le monde
+            // Envoie la liste complète à tout le monde
             io.emit('onlineUsersList', Array.from(connectedUsers.values()));
         });
 
-        // Un utilisateur se déconnecte
         socket.on('disconnect', () => {
             const userData = connectedUsers.get(socket.id);
             if (userData) {
-                userSockets.delete(userData.userId);
-                console.log('Utilisateur déconnecté:', userData.pseudo);
+                const { userId, pseudo } = userData;
+
+                // Ne supprime de userSockets que si c'est bien ce socket
+                if (userSockets.get(userId) === socket.id) {
+                    userSockets.delete(userId);
+                }
+
+                console.log('Utilisateur déconnecté:', pseudo);
                 connectedUsers.delete(socket.id);
 
-                // Notifie les autres de la déconnexion
                 socket.broadcast.emit('userStatusUpdate', {
-                    userId: userData.userId,
-                    pseudo: userData.pseudo,
-                    status: 'offline'
+                    userId, pseudo, status: 'offline'
                 });
 
-                // Envoie la liste mise à jour
                 io.emit('onlineUsersList', Array.from(connectedUsers.values()));
             }
         });
 
-        // Reçoit un nouveau commentaire et le diffuse aux autres
         socket.on('newComment', (commentData) => {
             console.log('Nouveau commentaire notifié:', commentData);
             socket.broadcast.emit('commentAdded', commentData);
         });
 
-        // Reçoit un like et le diffuse aux autres
         socket.on('postLiked', (likeData) => {
             console.log('Like notifié:', likeData);
             socket.broadcast.emit('postLikeUpdate', likeData);

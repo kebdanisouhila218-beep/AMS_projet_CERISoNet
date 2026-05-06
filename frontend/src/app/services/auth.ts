@@ -6,13 +6,11 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class Auth {
 
-  // --- Notifications (inchangé) ---
   private notificationMessage = new ReplaySubject<string>(1);
   private notificationType = new ReplaySubject<string>(1);
   message$ = this.notificationMessage.asObservable();
   type$ = this.notificationType.asObservable();
 
-  // --- Session ---
   private _userId = new BehaviorSubject<string>('Inconnu');
   userId$ = this._userId.asObservable();
 
@@ -31,13 +29,13 @@ export class Auth {
     }, 10000);
   }
 
-  /** Appelé une fois au démarrage (depuis Wall ou App) */
   loadSession(websocketService: any): void {
     const derniereConnexion = localStorage.getItem('derniereConnexion');
     if (!derniereConnexion) {
       this.router.navigate(['/login']);
       return;
     }
+
     this.http.get<any>('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
       .subscribe({
         next: (data) => {
@@ -46,12 +44,12 @@ export class Auth {
             this.router.navigate(['/login']);
             return;
           }
+
           this._userId.next(data.userId || 'Inconnu');
+
           if (data.userId) {
-            websocketService.emit('userConnected', {
-              userId: data.userId,
-              pseudo: data.userPseudo || 'Utilisateur'
-            });
+            // identify() recrée un socket propre et envoie userConnected
+            websocketService.identify(data.userId, data.userPseudo || 'Utilisateur');
           }
         },
         error: () => {
@@ -61,7 +59,6 @@ export class Auth {
       });
   }
 
-  /** Vérification périodique de session */
   checkSession(): void {
     this.http.get<any>('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
       .subscribe({
@@ -81,7 +78,9 @@ export class Auth {
   logout(): void {
     localStorage.removeItem('derniereConnexion');
     this.http.get<any>('https://pedago.univ-avignon.fr:3170/logout', { withCredentials: true })
-      .subscribe({ next: () => this.router.navigate(['/login']),
-                   error: () => this.router.navigate(['/login']) });
+      .subscribe({
+        next: () => this.router.navigate(['/login']),
+        error: () => this.router.navigate(['/login'])
+      });
   }
 }

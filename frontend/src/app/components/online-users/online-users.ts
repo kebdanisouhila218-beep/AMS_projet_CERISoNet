@@ -12,10 +12,10 @@ export class OnlineUsersComponent implements OnChanges {
   @Input() onlineUsers: any[] = [];
   @Input() currentUserId: any;
 
-  othersOnline: any[] = [];  // ← plus un getter, une vraie propriété
+  othersOnline: any[] = [];
 
   ngOnChanges(): void {
-    // Recalculé à chaque changement d'input (liste OU currentUserId)
+    // Recalculé à chaque changement de liste OU de currentUserId
     this.othersOnline = this.onlineUsers.filter(
       u => String(u.userId) !== String(this.currentUserId)
     );
