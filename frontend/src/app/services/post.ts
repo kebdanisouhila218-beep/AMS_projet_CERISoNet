@@ -47,6 +47,9 @@ export class PostService {
     this.httpOptions
   );
 }
+getAuthors(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/posts/authors`, this.httpOptions);
+}
 
   getUserPseudo(userId: number): string {
   if (!userId) return 'Anonyme';

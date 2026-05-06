@@ -17,12 +17,11 @@
         <option *ngFor="let tag of availableHashtags" [value]="tag">{{ tag }}</option>
       </select>
     </div>
-    <div class="filter-group">
+   <div class="filter-group">
   <label>Propriétaire</label>
   <select [(ngModel)]="filterAuthor" (change)="onAuthorChange()">
     <option value="">Tous les posts</option>
-    <option value="me">Mes posts</option>
-    <option value="others">Les autres</option>
+    <option *ngFor="let user of availableAuthors" [value]="user.id">{{ user.name }}</option>
   </select>
 </div>
 

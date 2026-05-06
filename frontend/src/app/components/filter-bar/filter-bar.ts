@@ -34,6 +34,7 @@ export class FilterBarComponent {
   onAuthorChange(): void {
   this.emitFilters();
 }
+@Input() availableAuthors: { id: number; name: string }[] = [];
 
   // Remet tous les filtres à zéro
   resetFilters(): void {

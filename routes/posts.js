@@ -18,6 +18,30 @@ router.get('/hashtags', (req, res) => {
 });
 
 // ============================================================
+// ROUTE GET /authors : récupère tous les auteurs distincts
+// Doit être AVANT la route GET / 
+// ============================================================
+router.get('/authors', (req, res) => {
+    connectMongo()
+        .then(mongoBase => {
+            return mongoBase.db()
+                .collection('CERISoNet')
+                .distinct('createdBy', { createdBy: { $exists: true } });
+        })
+        .then(authorIds => {
+            const ids = authorIds.filter(id => id && Number.isInteger(Number(id))).map(Number);
+            if (ids.length === 0) return res.json({ success: true, authors: [] });
+            return pgClient.query(
+                `SELECT id, prenom, nom FROM fredouil.compte WHERE id = ANY($1)`, [ids]
+            ).then(pgResult => {
+                const authors = pgResult.rows.map(u => ({ id: u.id, name: `${u.nom} ${u.prenom}` }));
+                res.json({ success: true, authors });
+            });
+        })
+        .catch(err => res.json({ success: false, error: err.message }));
+});
+
+// ============================================================
 // ROUTE GET / : récupère les posts avec tri, filtre et pagination
 // ============================================================
 router.get('/', (req, res) => {
@@ -31,10 +55,8 @@ router.get('/', (req, res) => {
     const userId = req.session?.userId;
     const filter = {};
     if (hashtag) filter.hashtags = hashtag;
-    if (author === 'me' && userId) {
-        filter.createdBy = parseInt(userId);
-    } else if (author === 'others' && userId) {
-        filter.createdBy = { $ne: parseInt(userId) };
+    if (author && author !== '') {
+        filter.createdBy = parseInt(author);
     }
 
     connectMongo()

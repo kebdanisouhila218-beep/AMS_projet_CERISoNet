@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
-
   private socket: Socket | null = null;
   private socketUrl = 'https://pedago.univ-avignon.fr:3170';
 
-  // Subjects exposés à Wall
-  onlineUsers$ = new Subject<any[]>();
+  // BehaviorSubject garde la dernière valeur même si Wall s'abonne après
+  onlineUsers$ = new BehaviorSubject<any[]>([]);
   newComment$ = new Subject<any>();
   likeUpdate$ = new Subject<any>();
   userStatus$ = new Subject<any>();
@@ -32,7 +31,6 @@ export class WebsocketService {
       transports: ['websocket', 'polling']
     });
 
-    // À la connexion, on s'identifie via session
     this.socket.on('connect', () => {
       this.http.get('https://pedago.univ-avignon.fr:3170/test-session', { withCredentials: true })
         .subscribe((data: any) => {
@@ -45,7 +43,6 @@ export class WebsocketService {
         });
     });
 
-    // Alimente les Subjects — Wall s'y abonne
     this.socket.on('onlineUsersList', (users: any[]) => {
       this.onlineUsers$.next(users);
     });

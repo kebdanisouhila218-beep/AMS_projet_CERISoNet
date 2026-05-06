@@ -46,10 +46,11 @@
   </div>
 
   <app-filter-bar
-    [availableHashtags]="availableHashtags"
-    [totalPosts]="totalPosts"
-    (filtersChanged)="onFiltersChanged($event)">
-  </app-filter-bar>
+  [availableHashtags]="availableHashtags"
+  [availableAuthors]="availableAuthors"
+  [totalPosts]="totalPosts"
+  (filtersChanged)="onFiltersChanged($event)">
+</app-filter-bar>
 
   <app-post-card
   *ngFor="let post of posts"

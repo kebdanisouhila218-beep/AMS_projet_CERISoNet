@@ -9,8 +9,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './online-users.css'
 })
 export class OnlineUsersComponent {
-  // Liste des utilisateurs connectés reçue depuis Wall
   @Input() onlineUsers: any[] = [];
-  // ID de l'utilisateur connecté pour ne pas s'afficher soi-même
   @Input() currentUserId: any;
+
+  get othersOnline(): any[] {
+    return this.onlineUsers.filter(u => String(u.userId) !== String(this.currentUserId));
+  }
 }

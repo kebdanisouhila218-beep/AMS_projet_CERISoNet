@@ -31,6 +31,7 @@ export class Wall implements OnInit, OnDestroy {
   currentUserId: string = 'Inconnu';
   onlineUsers: any[] = [];
   availableHashtags: string[] = [];
+  availableAuthors: { id: number; name: string }[] = [];
   sortOption = 'recent';
   filterHashtag = '';
   filterAuthor = '';
@@ -46,10 +47,8 @@ export class Wall implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Charge la session et connecte le websocket
     this.authService.loadSession(this.websocketService);
 
-    // Récupère userId depuis le service
     this.subs.push(
       this.authService.userId$.subscribe(id => {
         this.currentUserId = id;
@@ -58,6 +57,7 @@ export class Wall implements OnInit, OnDestroy {
     );
 
     this.loadHashtags();
+    this.loadAuthors();
     this.loadPosts();
     this.initWebSocketSubscriptions();
 
@@ -111,6 +111,15 @@ export class Wall implements OnInit, OnDestroy {
   loadHashtags(): void {
     this.postService.getHashtags().subscribe((data: any) => {
       if (data.success) this.availableHashtags = data.hashtags;
+    });
+  }
+
+  loadAuthors(): void {
+    this.postService.getAuthors().subscribe((data: any) => {
+      if (data.success) {
+        this.availableAuthors = data.authors;
+        this.cdr.detectChanges();
+      }
     });
   }
 
