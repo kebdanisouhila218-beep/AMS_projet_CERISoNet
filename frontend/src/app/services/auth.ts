@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class Auth {
-
+//radio dernier valeur
   private notificationMessage = new ReplaySubject<string>(1);
   private notificationType = new ReplaySubject<string>(1);
   message$ = this.notificationMessage.asObservable();
+  //listen only
   type$ = this.notificationType.asObservable();
 
   private _userId = new BehaviorSubject<string>('Inconnu');

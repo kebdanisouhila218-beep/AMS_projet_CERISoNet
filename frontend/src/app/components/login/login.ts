@@ -24,7 +24,7 @@ export class Login {
     }
 
     const url = `https://pedago.univ-avignon.fr:3170/login?email=${encodeURIComponent(this.email)}&password=${encodeURIComponent(this.password)}`;
-
+//credentiels Envoie les cookies 
     this.http.get<any>(url, { withCredentials: true }).subscribe({  
       next: (response) => {
         if (response.success) {
